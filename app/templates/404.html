@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}الصفحة غير موجودة - النخبة للتجارة الدولية{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="container">
+        <div class="error-content">
+            <h1>404</h1>
+            <h2>الصفحة غير موجودة</h2>
+            <p>عذراً، الصفحة التي تبحث عنها غير موجودة.</p>
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">العودة للصفحة الرئيسية</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.error-content h1 {
+    font-size: 8rem;
+    color: #1e40af;
+    margin-bottom: 1rem;
+}
+
+.error-content h2 {
+    font-size: 2rem;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.error-content p {
+    font-size: 1.2rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}
+
