@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+
+{% block title %}Trading Services - Al-Nokhba International Trading{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)), 
+                    url('{{ url_for("static", filename="images/business_handshake.jpg") }}') center/cover;
+        height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+        max-width: 600px;
+    }
+
+    .services-section {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .tech-showcase {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .tech-showcase-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .tech-showcase-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .tech-showcase-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .tech-showcase-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .tech-showcase-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+
+    .service-card {
+        background-color: #f8f9fa;
+        padding: 3rem 2rem;
+        border-radius: 15px;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    }
+
+    .service-icon {
+        font-size: 4rem;
+        color: #f59e0b;
+        margin-bottom: 2rem;
+    }
+
+    .service-card h3 {
+        font-size: 1.5rem;
+        color: #1e40af;
+        margin-bottom: 1rem;
+    }
+
+    .service-card p {
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .service-features {
+        list-style: none;
+        text-align: left;
+    }
+
+    .service-features li {
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .service-features li:before {
+        content: "✓";
+        color: #059669;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+
+    .brands-section {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .brands-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .brand-card {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .brand-card:hover {
+        transform: scale(1.05);
+    }
+
+    .brand-logo {
+        height: 60px;
+        width: auto;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        text-align: center;
+        color: white;
+    }
+
+    .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-white {
+        background-color: white;
+        color: #1e40af;
+    }
+
+    .btn-white:hover {
+        background-color: #f3f4f6;
+        color: #1e40af;
+    }
+
+    /* Data Center Showcase Section */
+    .datacenter-showcase {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .datacenter-showcase-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .datacenter-showcase-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .datacenter-showcase-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .datacenter-showcase-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .datacenter-showcase-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    /* Networking Showcase Section */
+    .networking-showcase {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .networking-showcase-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .networking-showcase-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .networking-showcase-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .networking-showcase-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .networking-showcase-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>Trading Services</h1>
+        <p>Comprehensive technology trading solutions for businesses across the Middle East and North Africa</p>
+    </div>
+</section>
+
+<!-- Technology Showcase Section -->
+<section class="tech-showcase">
+    <div class="container">
+        <div class="tech-showcase-content">
+            <div class="tech-showcase-text">
+                <h2>Advanced Technology Solutions</h2>
+                <p>We provide cutting-edge technology solutions that empower businesses to achieve their goals. Our extensive portfolio includes the latest innovations from world-renowned manufacturers.</p>
+                <p>From enterprise-grade servers to consumer electronics, we ensure that our clients have access to the most advanced and reliable technology products available in the market.</p>
+                <p>Our team of experts works closely with clients to understand their specific requirements and provide tailored solutions that deliver maximum value and performance.</p>
+            </div>
+            <div class="tech-showcase-image">
+                <img src="{{ url_for('static', filename='images/technology_office.jpg') }}" alt="Technology Office">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+    <div class="container">
+        <h2 class="text-center" style="font-size: 2.5rem; color: #1e40af; margin-bottom: 1rem;">Our Trading Services</h2>
+        <p class="text-center" style="font-size: 1.1rem; color: #6b7280; max-width: 800px; margin: 0 auto;">We provide comprehensive trading solutions for technology equipment, serving businesses of all sizes with competitive prices and reliable service.</p>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <h3>Computer Systems & Laptops</h3>
+                <p>Complete range of desktop computers, laptops, and workstations from leading manufacturers.</p>
+                <ul class="service-features">
+                    <li>Business laptops and desktops</li>
+                    <li>Gaming systems and workstations</li>
+                    <li>Custom configuration options</li>
+                    <li>Bulk ordering discounts</li>
+                    <li>Technical support and warranty</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h3>Servers & Networking</h3>
+                <p>Enterprise-grade servers, networking equipment, and infrastructure solutions.</p>
+                <ul class="service-features">
+                    <li>Rack and tower servers</li>
+                    <li>Network switches and routers</li>
+                    <li>Storage solutions</li>
+                    <li>Data center equipment</li>
+                    <li>Installation and configuration</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Security & Surveillance</h3>
+                <p>Advanced security systems and surveillance solutions for comprehensive protection.</p>
+                <ul class="service-features">
+                    <li>IP cameras and CCTV systems</li>
+                    <li>Access control systems</li>
+                    <li>Video management software</li>
+                    <li>Alarm and monitoring systems</li>
+                    <li>Professional installation</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Devices & Tablets</h3>
+                <p>Latest smartphones, tablets, and mobile accessories for business and personal use.</p>
+                <ul class="service-features">
+                    <li>Business smartphones</li>
+                    <li>Tablets and 2-in-1 devices</li>
+                    <li>Mobile accessories</li>
+                    <li>Enterprise mobility solutions</li>
+                    <li>Device management services</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-tv"></i>
+                </div>
+                <h3>Displays & Monitors</h3>
+                <p>Professional displays, monitors, and digital signage solutions for various applications.</p>
+                <ul class="service-features">
+                    <li>Professional monitors</li>
+                    <li>Large format displays</li>
+                    <li>Interactive displays</li>
+                    <li>Digital signage solutions</li>
+                    <li>Mounting and installation</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-print"></i>
+                </div>
+                <h3>Printing Solutions</h3>
+                <p>Complete printing solutions including printers, scanners, and document management systems.</p>
+                <ul class="service-features">
+                    <li>Office printers and MFPs</li>
+                    <li>Large format printers</li>
+                    <li>Scanners and document systems</li>
+                    <li>Print management software</li>
+                    <li>Maintenance and supplies</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Data Center Showcase Section -->
+<section class="datacenter-showcase">
+    <div class="container">
+        <div class="datacenter-showcase-content">
+            <div class="datacenter-showcase-text">
+                <h2>Enterprise Data Center Solutions</h2>
+                <p>We provide comprehensive data center infrastructure solutions, from server hardware to complete rack installations and network configurations.</p>
+                <p>Our expertise includes designing and implementing scalable data center environments that meet the highest standards of performance, reliability, and security.</p>
+                <p>From small business server rooms to large enterprise data centers, we deliver solutions that grow with your business needs.</p>
+            </div>
+            <div class="datacenter-showcase-image">
+                <img src="{{ url_for('static', filename='images/data_center.jpg') }}" alt="Modern Data Center">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Networking Conference Section -->
+<section class="networking-showcase">
+    <div class="container">
+        <div class="networking-showcase-content">
+            <div class="networking-showcase-image">
+                <img src="{{ url_for('static', filename='images/networking_conference.jpg') }}" alt="Business Networking Conference">
+            </div>
+            <div class="networking-showcase-text">
+                <h2>Industry Partnerships & Events</h2>
+                <p>We actively participate in major technology conferences and industry events to stay at the forefront of technological innovations and maintain strong partnerships with leading manufacturers.</p>
+                <p>Our team regularly attends international trade shows, product launches, and technical training sessions to ensure we can provide our clients with the latest solutions and expert guidance.</p>
+                <p>These partnerships enable us to offer exclusive deals, early access to new products, and comprehensive technical support.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Brands Section -->
+<section class="brands-section">
+    <div class="container">
+        <h2 class="text-center" style="font-size: 2.5rem; color: #1e40af; margin-bottom: 1rem;">Our Partner Brands</h2>
+        <p class="text-center" style="font-size: 1.1rem; color: #6b7280;">We are authorized distributors for the world's leading technology brands</p>
+        
+        <div class="brands-grid">
+            <div class="brand-card">
+                <img src="{{ url_for('static', filename='assets/logos/dell_logo.png') }}" alt="Dell" class="brand-logo">
+            </div>
+            <div class="brand-card">
+                <img src="{{ url_for('static', filename='assets/logos/hp_logo.jpg') }}" alt="HP" class="brand-logo">
+            </div>
+            <div class="brand-card">
+                <img src="{{ url_for('static', filename='assets/logos/lenovo_logo.png') }}" alt="Lenovo" class="brand-logo">
+            </div>
+            <div class="brand-card">
+                <img src="{{ url_for('static', filename='assets/logos/samsung_logo.png') }}" alt="Samsung" class="brand-logo">
+            </div>
+            <div class="brand-card">
+                <img src="{{ url_for('static', filename='assets/logos/asus_logo.png') }}" alt="ASUS" class="brand-logo">
+            </div>
+            <div class="brand-card">
+                <img src="{{ url_for('static', filename='assets/logos/hikvision_logo.png') }}" alt="Hikvision" class="brand-logo">
+            </div>
+            <div class="brand-card">
+                <img src="{{ url_for('static', filename='assets/logos/benq_logo.png') }}" alt="BenQ" class="brand-logo">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Get Started?</h2>
+        <p>Contact us today for competitive quotes and expert consultation</p>
+        <a href="{{ url_for('contact') }}" class="btn btn-white">Get a Quote</a>
+    </div>
+</section>
+{% endblock %}
+

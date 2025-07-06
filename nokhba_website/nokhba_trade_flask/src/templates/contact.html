@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Al-Nokhba International Trading{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)), 
+                    url('{{ url_for("static", filename="images/business_handshake.jpg") }}') center/cover;
+        height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+        max-width: 600px;
+    }
+
+    .contact-section {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .consultation-showcase {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .consultation-showcase-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .consultation-showcase-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .consultation-showcase-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .consultation-showcase-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .consultation-showcase-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    .contact-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .contact-info {
+        background-color: white;
+        padding: 3rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .contact-info h3 {
+        font-size: 2rem;
+        color: #1e40af;
+        margin-bottom: 2rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .contact-item:hover {
+        transform: translateX(10px);
+    }
+
+    .contact-icon {
+        font-size: 1.5rem;
+        color: #f59e0b;
+        margin-right: 1rem;
+        width: 40px;
+        text-align: center;
+    }
+
+    .contact-details h4 {
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .contact-details p {
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .contact-form {
+        background-color: white;
+        padding: 3rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .contact-form h3 {
+        font-size: 2rem;
+        color: #1e40af;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        width: 100%;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .map-section {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .map-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .map-container h3 {
+        font-size: 2rem;
+        color: #1e40af;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .map-placeholder {
+        background-color: #e5e7eb;
+        height: 400px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .map-placeholder iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 15px;
+    }
+
+    .office-hours {
+        background-color: #1e40af;
+        color: white;
+        padding: 3rem;
+        border-radius: 15px;
+        margin-top: 2rem;
+    }
+
+    .office-hours h4 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #fbbf24;
+    }
+
+    .hours-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .hours-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    @media (max-width: 768px) {
+        .contact-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+    }
+
+    /* Innovation Showcase Section */
+    .innovation-showcase {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .innovation-showcase-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .innovation-showcase-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .innovation-showcase-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .innovation-showcase-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .innovation-showcase-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>Contact Us</h1>
+        <p>Get in touch with our team for expert consultation and competitive quotes</p>
+    </div>
+</section>
+
+<!-- Consultation Showcase Section -->
+<section class="consultation-showcase">
+    <div class="consultation-showcase-content">
+        <div class="consultation-showcase-text">
+            <h2>Expert Consultation</h2>
+            <p>Our experienced team of trade specialists is ready to provide you with comprehensive consultation services tailored to your specific business needs.</p>
+            <p>Whether you're looking to expand into new markets, optimize your supply chain, or find the best technology solutions, we're here to guide you every step of the way.</p>
+            <p>Schedule a consultation today and discover how Al-Nokhba International Trading can help your business achieve its goals.</p>
+        </div>
+        <div class="consultation-showcase-image">
+            <img src="{{ url_for('static', filename='images/business_meeting.jpg') }}" alt="Business Consultation Meeting">
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="contact-container">
+        <!-- Contact Information -->
+        <div class="contact-info">
+            <h3>Get In Touch</h3>
+            
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="contact-details">
+                    <h4>Our Location</h4>
+                    <p>City Center Plaza B10074<br>Zahraa Al Maadi, Ezbet Fahmy<br>Maadi, Cairo Governorate 11742, Egypt</p>
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-details">
+                    <h4>Phone Number</h4>
+                    <p>+2 01222233255<br>Available during business hours</p>
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="contact-details">
+                    <h4>Email Address</h4>
+                    <p>mosaad@nokhbatrade.com<br>We respond within 24 hours</p>
+                </div>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="contact-details">
+                    <h4>Service Areas</h4>
+                    <p>Middle East, North Africa<br>International shipping available</p>
+                </div>
+            </div>
+
+            <div class="office-hours">
+                <h4>Business Hours</h4>
+                <div class="hours-grid">
+                    <div class="hours-item">
+                        <span>Sunday - Thursday</span>
+                        <span>9:00 AM - 5:00 PM</span>
+                    </div>
+                    <div class="hours-item">
+                        <span>Friday - Saturday</span>
+                        <span>Closed</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form">
+            <h3>Send Us a Message</h3>
+            <form id="contactForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="company">Company Name</label>
+                    <input type="text" id="company" name="company">
+                </div>
+
+                <div class="form-group">
+                    <label for="service">Service Interest</label>
+                    <select id="service" name="service">
+                        <option value="">Select a service</option>
+                        <option value="trading">Technology Trading</option>
+                        <option value="import">Import Services</option>
+                        <option value="export">Export Services</option>
+                        <option value="consultation">Business Consultation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea id="message" name="message" placeholder="Please describe your requirements or questions..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Innovation Lab Section -->
+<section class="innovation-showcase">
+    <div class="container">
+        <div class="innovation-showcase-content">
+            <div class="innovation-showcase-image">
+                <img src="{{ url_for('static', filename='images/innovation_lab.jpg') }}" alt="Technology Innovation Lab">
+            </div>
+            <div class="innovation-showcase-text">
+                <h2>Innovation & Technology Leadership</h2>
+                <p>Our commitment to innovation drives us to continuously explore emerging technologies and develop cutting-edge solutions for our clients.</p>
+                <p>We maintain close relationships with technology research centers and innovation labs to stay ahead of industry trends and provide our clients with the most advanced solutions available.</p>
+                <p>From AI and IoT to cloud computing and cybersecurity, we help businesses leverage the latest technologies to achieve their strategic objectives.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section">
+    <div class="map-container">
+        <h3>Our Location</h3>
+        <div class="map-placeholder">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3456.2847285736434!2d31.270334315436!3d29.970420081879!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x145839eb29e6e751%3A0x70bf5e249ef813dc!2sAl%20Nokhba%20International%20Trading!5e0!3m2!1sen!2seg!4v1635789012345!5m2!1sen!2seg"
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Al-Nokhba International Trading Location - City Center Plaza, Maadi, Cairo">
+            </iframe>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        
+        // Simple validation
+        if (!data.firstName || !data.lastName || !data.email || !data.message) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        // Simulate form submission
+        const submitBtn = document.querySelector('.submit-btn');
+        const originalText = submitBtn.textContent;
+        
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        setTimeout(() => {
+            alert('Thank you for your message! We will get back to you within 24 hours.');
+            this.reset();
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }, 2000);
+    });
+</script>
+{% endblock %}
+

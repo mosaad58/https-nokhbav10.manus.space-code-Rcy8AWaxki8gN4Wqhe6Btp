@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Import & Export Services - Al-Nokhba International Trading{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)), 
+                    url('{{ url_for("static", filename="images/shipping_containers.jpg") }}') center/cover;
+        height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+        max-width: 600px;
+    }
+
+    .services-section {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .logistics-showcase {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .logistics-showcase-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .logistics-showcase-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .logistics-showcase-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .logistics-showcase-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .logistics-showcase-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+
+    .service-card {
+        background-color: #f8f9fa;
+        padding: 3rem 2rem;
+        border-radius: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    }
+
+    .service-icon {
+        font-size: 4rem;
+        color: #f59e0b;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .service-card h3 {
+        font-size: 1.8rem;
+        color: #1e40af;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .service-card p {
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .service-features {
+        list-style: none;
+    }
+
+    .service-features li {
+        color: #4b5563;
+        margin-bottom: 0.8rem;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .service-features li:before {
+        content: "✓";
+        color: #059669;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+
+    .process-section {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .process-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .process-step {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        text-align: center;
+        position: relative;
+    }
+
+    .step-number {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0 auto 1rem;
+    }
+
+    .process-step h4 {
+        color: #1e40af;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .process-step p {
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .countries-section {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .countries-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .country-item {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .country-item:hover {
+        transform: translateY(-5px);
+        background-color: #e5e7eb;
+    }
+
+    .country-flag {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .country-name {
+        font-weight: 600;
+        color: #1e40af;
+    }
+
+    .cta-section {
+        padding: 6rem 0;
+        background: linear-gradient(rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9)), 
+                    url('{{ url_for("static", filename="images/warehouse_distribution.jpg") }}') center/cover;
+        text-align: center;
+        color: white;
+    }
+
+    .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-white {
+        background-color: white;
+        color: #1e40af;
+    }
+
+    .btn-white:hover {
+        background-color: #f3f4f6;
+        color: #1e40af;
+    }
+
+    /* Port Showcase Section */
+    .port-showcase {
+        padding: 6rem 0;
+        background-color: white;
+    }
+
+    .port-showcase-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .port-showcase-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .port-showcase-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .port-showcase-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .port-showcase-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    /* Global Shipping Showcase Section */
+    .global-shipping-showcase {
+        padding: 6rem 0;
+        background-color: #f8f9fa;
+    }
+
+    .global-shipping-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .global-shipping-text h2 {
+        font-size: 2.5rem;
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+    }
+
+    .global-shipping-text p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #4b5563;
+    }
+
+    .global-shipping-image {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .global-shipping-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>Import & Export Services</h1>
+        <p>Comprehensive international trade solutions connecting businesses across global markets</p>
+    </div>
+</section>
+
+<!-- Logistics Showcase Section -->
+<section class="logistics-showcase">
+    <div class="container">
+        <div class="logistics-showcase-content">
+            <div class="logistics-showcase-image">
+                <img src="{{ url_for('static', filename='images/business_meeting.jpg') }}" alt="International Business Meeting">
+            </div>
+            <div class="logistics-showcase-text">
+                <h2>Global Trade Expertise</h2>
+                <p>With over 15 years of experience in international trade, we have built a comprehensive network that spans across continents, enabling seamless import and export operations.</p>
+                <p>Our team of trade specialists understands the complexities of international commerce and works diligently to ensure that your products reach their destination safely, on time, and in compliance with all regulatory requirements.</p>
+                <p>From small shipments to large-scale logistics operations, we provide scalable solutions that grow with your business needs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+    <div class="container">
+        <h2 class="text-center" style="font-size: 2.5rem; color: #1e40af; margin-bottom: 1rem;">Our Import & Export Services</h2>
+        <p class="text-center" style="font-size: 1.1rem; color: #6b7280; max-width: 800px; margin: 0 auto;">With over 15 years of experience in international trade, we provide end-to-end import and export solutions for technology products and equipment.</p>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-ship"></i>
+                </div>
+                <h3>Import Services</h3>
+                <p>Complete import solutions for technology products from global manufacturers to Middle East and North Africa markets.</p>
+                <ul class="service-features">
+                    <li>Customs clearance and documentation</li>
+                    <li>Freight forwarding and logistics</li>
+                    <li>Quality inspection and testing</li>
+                    <li>Warehousing and distribution</li>
+                    <li>Regulatory compliance assistance</li>
+                    <li>Insurance and risk management</li>
+                    <li>Multi-modal transportation options</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <h3>Export Services</h3>
+                <p>Professional export services helping regional businesses reach international markets with their products and services.</p>
+                <ul class="service-features">
+                    <li>Export documentation and permits</li>
+                    <li>International shipping coordination</li>
+                    <li>Market research and analysis</li>
+                    <li>Trade finance assistance</li>
+                    <li>Export compliance consulting</li>
+                    <li>Packaging and labeling services</li>
+                    <li>After-sales support coordination</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Process Section -->
+<section class="process-section">
+    <div class="container">
+        <h2 class="text-center" style="font-size: 2.5rem; color: #1e40af; margin-bottom: 1rem;">Our Process</h2>
+        <p class="text-center" style="font-size: 1.1rem; color: #6b7280;">Streamlined process ensuring efficient and reliable international trade operations</p>
+        
+        <div class="process-grid">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <h4>Consultation & Planning</h4>
+                <p>Initial consultation to understand your requirements and develop a customized trade solution.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <h4>Documentation & Permits</h4>
+                <p>Preparation of all necessary documentation, permits, and regulatory compliance requirements.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <h4>Logistics Coordination</h4>
+                <p>Coordination of shipping, freight forwarding, and transportation logistics for optimal efficiency.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <h4>Customs Clearance</h4>
+                <p>Professional customs clearance services ensuring smooth passage through international borders.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">5</div>
+                <h4>Quality Control</h4>
+                <p>Comprehensive quality inspection and testing to ensure products meet required standards.</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">6</div>
+                <h4>Delivery & Support</h4>
+                <p>Final delivery to destination with ongoing support and after-sales service coordination.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Countries Section -->
+<section class="countries-section">
+    <div class="container">
+        <h2 class="text-center" style="font-size: 2.5rem; color: #1e40af; margin-bottom: 1rem;">Countries We Serve</h2>
+        <p class="text-center" style="font-size: 1.1rem; color: #6b7280;">Our extensive network covers major markets across multiple continents</p>
+        
+        <div class="countries-grid">
+            <div class="country-item">
+                <div class="country-flag">🇪🇬</div>
+                <div class="country-name">Egypt</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇦🇪</div>
+                <div class="country-name">UAE</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇸🇦</div>
+                <div class="country-name">Saudi Arabia</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇰🇼</div>
+                <div class="country-name">Kuwait</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇶🇦</div>
+                <div class="country-name">Qatar</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇧🇭</div>
+                <div class="country-name">Bahrain</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇴🇲</div>
+                <div class="country-name">Oman</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇯🇴</div>
+                <div class="country-name">Jordan</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇱🇧</div>
+                <div class="country-name">Lebanon</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇹🇷</div>
+                <div class="country-name">Turkey</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇨🇳</div>
+                <div class="country-name">China</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇺🇸</div>
+                <div class="country-name">United States</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇩🇪</div>
+                <div class="country-name">Germany</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇬🇧</div>
+                <div class="country-name">United Kingdom</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇯🇵</div>
+                <div class="country-name">Japan</div>
+            </div>
+            <div class="country-item">
+                <div class="country-flag">🇰🇷</div>
+                <div class="country-name">South Korea</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Shipping Port Showcase Section -->
+<section class="port-showcase">
+    <div class="container">
+        <div class="port-showcase-content">
+            <div class="port-showcase-text">
+                <h2>Global Shipping Network</h2>
+                <p>Our strategic partnerships with major international ports and shipping lines enable us to provide efficient and cost-effective transportation solutions worldwide.</p>
+                <p>We work with the world's busiest ports and most reliable shipping companies to ensure your cargo reaches its destination safely and on time.</p>
+                <p>From container shipping to air freight, we handle all aspects of international logistics with precision and care.</p>
+            </div>
+            <div class="port-showcase-image">
+                <img src="{{ url_for('static', filename='images/shipping_port.jpg') }}" alt="International Shipping Port">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Global Shipping Section -->
+<section class="global-shipping-showcase">
+    <div class="container">
+        <div class="global-shipping-content">
+            <div class="global-shipping-image">
+                <img src="{{ url_for('static', filename='images/global_shipping.jpg') }}" alt="Global Shipping Operations">
+            </div>
+            <div class="global-shipping-text">
+                <h2>Comprehensive Logistics Solutions</h2>
+                <p>Our end-to-end logistics solutions cover every aspect of international trade, from initial consultation to final delivery and after-sales support.</p>
+                <p>We provide real-time tracking, comprehensive insurance coverage, and dedicated customer support throughout the entire shipping process.</p>
+                <p>With our extensive network of partners and agents worldwide, we ensure seamless operations across all major trade routes.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Start Your International Trade Journey</h2>
+        <p>Contact us today to discuss your import and export requirements</p>
+        <a href="{{ url_for('contact') }}" class="btn btn-white">Get Started</a>
+    </div>
+</section>
+{% endblock %}
+
