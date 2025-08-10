@@ -225,11 +225,11 @@
     <!-- Header -->
     <header class="header">
         <nav class="nav-container">
-            <a href="{{ url_for('home') }}" class="logo">
+            <a href="{{ url_for('main.index') }}" class="logo">
                 <img src="{{ url_for('static', filename='assets/nokhba_logo_hd.png') }}" alt="Al-Nokhba International Trading">
             </a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('main.index') }}" class="{% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
                 <li><a href="{{ url_for('trading_services') }}" class="{% if request.endpoint == 'trading_services' %}active{% endif %}">Trading Services</a></li>
                 <li><a href="{{ url_for('import_export') }}" class="{% if request.endpoint == 'import_export' %}active{% endif %}">Import & Export</a></li>
                 <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact Us</a></li>
