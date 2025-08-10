@@ -230,9 +230,9 @@
             </a>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="{{ url_for('main.index') }}" class="{% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
-                <li><a href="{{ url_for('trading_services') }}" class="{% if request.endpoint == 'trading_services' %}active{% endif %}">Trading Services</a></li>
-                <li><a href="{{ url_for('import_export') }}" class="{% if request.endpoint == 'import_export' %}active{% endif %}">Import & Export</a></li>
-                <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact Us</a></li>
+                <li><a href="{{ url_for('main.trading_services') }}" class="{% if request.endpoint == 'main.trading_services' %}active{% endif %}">Trading Services</a></li>
+                <li><a href="{{ url_for('main.main.import_export') }}" class="{% if request.endpoint == 'main.main.import_export' %}active{% endif %}">Import & Export</a></li>
+                <li><a href="{{ url_for('main.main.contact') }}" class="{% if request.endpoint == 'main.contact' %}active{% endif %}">Contact Us</a></li>
             </ul>
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
@@ -260,10 +260,10 @@
             </div>
             <div class="footer-section">
                 <h3>Our Services</h3>
-                <a href="{{ url_for('trading_services') }}">Technology Equipment Trading</a>
-                <a href="{{ url_for('trading_services') }}">Security & Surveillance Systems</a>
-                <a href="{{ url_for('import_export') }}">Import Services</a>
-                <a href="{{ url_for('import_export') }}">Export Services</a>
+                <a href="{{ url_for('main.trading_services') }}">Technology Equipment Trading</a>
+                <a href="{{ url_for('main.trading_services') }}">Security & Surveillance Systems</a>
+                <a href="{{ url_for('main.import_export') }}">Import Services</a>
+                <a href="{{ url_for('main.import_export') }}">Export Services</a>
             </div>
             <div class="footer-section">
                 <h3>Contact Information</h3>
