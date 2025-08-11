@@ -232,7 +232,7 @@
                 <li><a href="{{ url_for('main.index') }}" class="{% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
                 <li><a href="{{ url_for('main.trading_services') }}" class="{% if request.endpoint == 'main.trading_services' %}active{% endif %}">Trading Services</a></li>
                 <li><a href="{{ url_for('main.import_export') }}" class="{% if request.endpoint == 'main.import_export' %}active{% endif %}">Import & Export</a></li>
-                <li><a href="{{ url_for('main.main.contact') }}" class="{% if request.endpoint == 'main.contact' %}active{% endif %}">Contact Us</a></li>
+                <li><a href="{{ url_for('main.contact') }}" class="{% if request.endpoint == 'main.contact' %}active{% endif %}">Contact Us</a></li>
             </ul>
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
