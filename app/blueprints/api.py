@@ -1,14 +1,11 @@
 """
 API Blueprint for Al-Nokhba International Trading Website
-Contains all API endpoints including currency converter with improved error handling
+Contains all API endpoints including currency converter
 """
 
 from flask import Blueprint, request, jsonify
 import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 import logging
-import time
 
 api_bp = Blueprint('api', __name__)
 
@@ -16,101 +13,30 @@ api_bp = Blueprint('api', __name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create a session with retry strategy
-def create_requests_session():
-    """Create a requests session with retry strategy and proper headers"""
-    session = requests.Session()
-    
-    # Define retry strategy
-    retry_strategy = Retry(
-        total=3,
-        status_forcelist=[429, 500, 502, 503, 504],
-        method_whitelist=["HEAD", "GET", "OPTIONS"],
-        backoff_factor=1
-    )
-    
-    # Mount adapter with retry strategy
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
-    
-    # Set headers to mimic a real browser
-    session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-    })
-    
-    return session
-
-# Global session instance
-http_session = create_requests_session()
-
 
 def get_exchange_rate_from_api(from_currency, to_currency):
-    """Get exchange rate from external API with better error handling"""
+    """Get exchange rate from external API"""
     try:
-        # Try multiple APIs in sequence
-        apis_to_try = [
-            {
-                'name': 'exchangerate-api',
-                'url': f"https://api.exchangerate-api.com/v4/latest/{from_currency}",
-                'parser': lambda data: data.get('rates', {}).get(to_currency)
-            },
-            {
-                'name': 'freeforexapi',
-                'url': f"https://api.freeforexapi.com/api/live?pairs={from_currency}{to_currency}",
-                'parser': lambda data: data.get('rates', {}).get(f"{from_currency}{to_currency}", {}).get('rate')
-            },
-            {
-                'name': 'currencyapi',
-                'url': f"https://api.currencyapi.com/v3/latest?apikey=YOUR_API_KEY&currencies={to_currency}&base_currency={from_currency}",
-                'parser': lambda data: data.get('data', {}).get(to_currency, {}).get('value')
-            }
-        ]
+        # Primary API: exchangerate-api.com
+        url = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
+        response = requests.get(url, timeout=10)
         
-        for api in apis_to_try:
-            try:
-                logger.info(f"Trying {api['name']} API...")
-                
-                # Make request with timeout and session
-                response = http_session.get(
-                    api['url'], 
-                    timeout=(5, 10),  # (connection timeout, read timeout)
-                    allow_redirects=True
-                )
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    rate = api['parser'](data)
-                    
-                    if rate and isinstance(rate, (int, float)) and rate > 0:
-                        logger.info(f"Successfully got rate from {api['name']}: {rate}")
-                        return float(rate)
-                else:
-                    logger.warning(f"{api['name']} returned status code: {response.status_code}")
-                    
-            except requests.exceptions.ConnectionError as e:
-                logger.warning(f"Connection error with {api['name']}: {e}")
-                continue
-            except requests.exceptions.Timeout as e:
-                logger.warning(f"Timeout error with {api['name']}: {e}")
-                continue
-            except requests.exceptions.RequestException as e:
-                logger.warning(f"Request error with {api['name']}: {e}")
-                continue
-            except (KeyError, ValueError, TypeError) as e:
-                logger.warning(f"Data parsing error with {api['name']}: {e}")
-                continue
-            
-            # Small delay between API attempts
-            time.sleep(0.5)
+        if response.status_code == 200:
+            data = response.json()
+            if to_currency in data['rates']:
+                return data['rates'][to_currency]
+        
+        # Fallback API: fixer.io (free tier)
+        fallback_url = f"https://api.fixer.io/latest?base={from_currency}&symbols={to_currency}"
+        fallback_response = requests.get(fallback_url, timeout=10)
+        
+        if fallback_response.status_code == 200:
+            fallback_data = fallback_response.json()
+            if 'rates' in fallback_data and to_currency in fallback_data['rates']:
+                return fallback_data['rates'][to_currency]
                 
     except Exception as e:
-        logger.error(f"Unexpected error fetching exchange rate: {e}")
+        logger.error(f"Error fetching exchange rate: {e}")
     
     return None
 
@@ -137,45 +63,15 @@ def get_default_rate(currency_pair):
         'USD_MAD': 9.85,
         'USD_TND': 3.12,
         'USD_DZD': 134.5,
-        'USD_LYD': 4.85,
-        # Add reverse rates
-        'EGP_USD': 1/49.35,
-        'AED_USD': 1/3.67,
-        'EUR_USD': 1/0.848,
-        'CNY_USD': 1/7.16,
-        'TRY_USD': 1/39.89,
-        'SAR_USD': 1/3.75,
-        # Add cross rates (example)
-        'EUR_EGP': 49.35 * 0.848,
-        'AED_EGP': 49.35 / 3.67,
+        'USD_LYD': 4.85
     }
-    
-    # If direct pair not found, try reverse
-    if currency_pair not in default_rates:
-        from_curr, to_curr = currency_pair.split('_')
-        reverse_pair = f"{to_curr}_{from_curr}"
-        if reverse_pair in default_rates:
-            return 1 / default_rates[reverse_pair]
     
     return default_rates.get(currency_pair, 1.0)
 
 
-def safe_get_timestamp():
-    """Safely get timestamp without external API dependency"""
-    try:
-        response = http_session.get('http://worldtimeapi.org/api/timezone/UTC', timeout=3)
-        if response.status_code == 200:
-            return response.json().get('datetime', time.strftime('%Y-%m-%dT%H:%M:%SZ'))
-    except:
-        pass
-    
-    # Fallback to local time
-    return time.strftime('%Y-%m-%dT%H:%M:%SZ')
-
-
 @api_bp.route('/exchange-rates')
 def exchange_rates():
-    """Currency exchange rates API endpoint with improved error handling"""
+    """Currency exchange rates API endpoint"""
     try:
         from_currency = request.args.get('from', 'USD').upper()
         to_currency = request.args.get('to', 'EGP').upper()
@@ -193,7 +89,6 @@ def exchange_rates():
         # If same currency, return 1
         if from_currency == to_currency:
             rate = 1.0
-            source = 'direct'
         else:
             # Try to get rate from API
             rate = get_exchange_rate_from_api(from_currency, to_currency)
@@ -202,10 +97,7 @@ def exchange_rates():
             if rate is None:
                 currency_pair = f"{from_currency}_{to_currency}"
                 rate = get_default_rate(currency_pair)
-                source = 'fallback'
                 logger.warning(f"Using default rate for {currency_pair}: {rate}")
-            else:
-                source = 'live'
         
         # Calculate converted amount
         converted_amount = amount * rate
@@ -213,25 +105,17 @@ def exchange_rates():
         return jsonify({
             'from': from_currency,
             'to': to_currency,
-            'rate': round(rate, 6),
+            'rate': rate,
             'amount': amount,
             'converted_amount': round(converted_amount, 2),
-            'source': source,  # Indicates if rate is 'live', 'fallback', or 'direct'
-            'timestamp': safe_get_timestamp(),
-            'status': 'success'
+            'timestamp': requests.get('http://worldtimeapi.org/api/timezone/UTC').json().get('datetime', 'N/A') if requests else 'N/A'
         })
         
     except ValueError:
-        return jsonify({
-            'error': 'Invalid amount parameter',
-            'status': 'error'
-        }), 400
+        return jsonify({'error': 'Invalid amount parameter'}), 400
     except Exception as e:
         logger.error(f"Exchange rate API error: {e}")
-        return jsonify({
-            'error': 'Internal server error',
-            'status': 'error'
-        }), 500
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @api_bp.route('/health')
@@ -240,8 +124,7 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'service': 'Al-Nokhba International Trading Website',
-        'version': '1.0.0',
-        'timestamp': safe_get_timestamp()
+        'version': '1.0.0'
     })
 
 
@@ -271,33 +154,4 @@ def supported_currencies():
         'LYD': 'Libyan Dinar'
     }
     
-    return jsonify({
-        'currencies': currencies,
-        'count': len(currencies),
-        'status': 'success'
-    })
-
-
-@api_bp.route('/test-connection')
-def test_connection():
-    """Test external API connections"""
-    test_results = {}
-    
-    try:
-        # Test exchangerate-api
-        response = http_session.get('https://api.exchangerate-api.com/v4/latest/USD', timeout=5)
-        test_results['exchangerate-api'] = {
-            'status': 'success' if response.status_code == 200 else 'failed',
-            'status_code': response.status_code,
-            'response_time': response.elapsed.total_seconds()
-        }
-    except Exception as e:
-        test_results['exchangerate-api'] = {
-            'status': 'error',
-            'error': str(e)
-        }
-    
-    return jsonify({
-        'test_results': test_results,
-        'timestamp': safe_get_timestamp()
-    })
+    return jsonify(currencies)
