@@ -77,51 +77,70 @@ def get_default_rate(currency_pair):
 
 @api_bp.route('/exchange-rates')
 def exchange_rates():
-    """Currency exchange rates API endpoint"""
+    """Currency exchange rates API endpoint with fallback"""
+
+    from_currency = request.args.get('from', 'USD').upper()
+    to_currency = request.args.get('to', 'EGP').upper()
+    amount = request.args.get('amount', 1)
+
+    supported_currencies = [
+        'USD', 'EGP', 'AED', 'EUR', 'CNY', 'TRY', 'SAR', 'KWD', 'QAR', 
+        'BHD', 'OMR', 'JOD', 'LBP', 'IQD', 'SYP', 'YER', 'MAD', 'TND', 
+        'DZD', 'LYD'
+    ]
+
+    # Validate amount
     try:
-        from_currency = request.args.get('from', 'USD').upper()
-        to_currency = request.args.get('to', 'EGP').upper()
-        amount = float(request.args.get('amount', 1))
-        
-        # Validate currencies
-        supported_currencies = ['USD', 'EGP', 'AED', 'EUR', 'CNY', 'TRY', 'SAR', 'KWD', 'QAR', 'BHD', 'OMR', 'JOD', 'LBP', 'IQD', 'SYP', 'YER', 'MAD', 'TND', 'DZD', 'LYD']
-        
-        if from_currency not in supported_currencies or to_currency not in supported_currencies:
-            return jsonify({
-                'error': 'Unsupported currency',
-                'supported_currencies': supported_currencies
-            }), 400
-        
-        # If same currency, return 1
+        amount = float(amount)
+    except ValueError:
+        return jsonify({'error': 'Invalid amount parameter'}), 400
+
+    # Validate currencies
+    if from_currency not in supported_currencies or to_currency not in supported_currencies:
+        return jsonify({
+            'error': 'Unsupported currency',
+            'supported_currencies': supported_currencies
+        }), 400
+
+    try:
+        # Get rate
         if from_currency == to_currency:
             rate = 1.0
         else:
-            # Try to get rate from API
             rate = get_exchange_rate_from_api(from_currency, to_currency)
-            
-            # If API fails, use default rates
             if rate is None:
                 currency_pair = f"{from_currency}_{to_currency}"
                 rate = get_default_rate(currency_pair)
                 logger.warning(f"Using default rate for {currency_pair}: {rate}")
-        
-        # Calculate converted amount
-        converted_amount = amount * rate
-        
+
+        converted_amount = round(amount * rate, 2)
+
         return jsonify({
             'from': from_currency,
             'to': to_currency,
             'rate': rate,
             'amount': amount,
-            'converted_amount': round(converted_amount, 2),
-            'timestamp': requests.get('http://worldtimeapi.org/api/timezone/UTC').json().get('datetime', 'N/A') if requests else 'N/A'
-        })
-        
-    except ValueError:
-        return jsonify({'error': 'Invalid amount parameter'}), 400
+            'converted_amount': converted_amount,
+            'timestamp': datetime.utcnow().isoformat() + 'Z'
+        }), 200
+
     except Exception as e:
         logger.error(f"Exchange rate API error: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+
+        # Use default fallback instead of failing
+        currency_pair = f"{from_currency}_{to_currency}"
+        rate = get_default_rate(currency_pair)
+        converted_amount = round(amount * rate, 2)
+
+        return jsonify({
+            'from': from_currency,
+            'to': to_currency,
+            'rate': rate,
+            'amount': amount,
+            'converted_amount': converted_amount,
+            'timestamp': datetime.utcnow().isoformat() + 'Z',
+            'note': 'Default rate used due to API error'
+        }), 200
 
 
 @api_bp.route('/health')
