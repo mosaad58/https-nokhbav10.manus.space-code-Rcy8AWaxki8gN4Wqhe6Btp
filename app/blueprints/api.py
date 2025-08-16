@@ -14,15 +14,36 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def get_exchange_rate_from_api(from_currency, to_currency):
+    """Try multiple APIs, fallback to default if all fail"""
+
+    # API 1: Frankfurter
     try:
-        url = f"https://api.frankfurter.app/latest?from={from_currency}&to={to_currency}"
-        response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            if 'rates' in data and to_currency in data['rates']:
-                return data['rates'][to_currency]
+        frankfurter_url = f"https://api.frankfurter.app/latest?from={from_currency}&to={to_currency}"
+        resp = requests.get(frankfurter_url, timeout=10)
+        if resp.status_code == 200:
+            data = resp.json()
+            if "rates" in data and to_currency in data["rates"]:
+                rate = data["rates"][to_currency]
+                logger.info(f"Rate from Frankfurter API: {rate}")
+                return rate
     except Exception as e:
-        logger.error(f"Error fetching exchange rate: {e}")
+        logger.warning(f"Frankfurter API failed: {e}")
+
+    # API 2: ExchangeRate.host (no API key, works for many cloud hosts)
+    try:
+        exch_url = f"https://api.exchangerate.host/latest?base={from_currency}&symbols={to_currency}"
+        resp = requests.get(exch_url, timeout=10)
+        if resp.status_code == 200:
+            data = resp.json()
+            if "rates" in data and to_currency in data["rates"]:
+                rate = data["rates"][to_currency]
+                logger.info(f"Rate from ExchangeRate.host API: {rate}")
+                return rate
+    except Exception as e:
+        logger.warning(f"ExchangeRate.host API failed: {e}")
+
+    # All APIs failed → return None (caller will use default rates)
+    logger.error(f"All APIs failed for {from_currency}_{to_currency}, using default.")
     return None
 
 
