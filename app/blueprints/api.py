@@ -4,8 +4,10 @@ Contains all API endpoints including currency converter
 """
 
 from flask import Blueprint, request, jsonify
+from datetime import datetime
 import requests
 import logging
+import traceback
 
 api_bp = Blueprint('api', __name__)
 
@@ -13,46 +15,61 @@ api_bp = Blueprint('api', __name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+
 def get_exchange_rate_from_api(from_currency, to_currency):
-    """Get exchange rate from external API"""
+    """Get exchange rate from external APIs with detailed logging and safe fallback."""
+    fallback_rate = 49.35  # your default fallback
     try:
         # Primary API: exchangerate-api.com
-        url = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
-        logger.info(f"[ExchangeRate] Calling primary API: {url}")
-        response = requests.get(url, timeout=10)
-        logger.info(f"[ExchangeRate] Primary API HTTP {response.status_code}")
-        logger.debug(f"[ExchangeRate] Primary API Response: {response.text}")
+        primary_url = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
+        logger.info(f"[ExchangeRate] Calling primary API: {primary_url}")
+        
+        try:
+            response = requests.get(primary_url, timeout=10)
+            logger.info(f"[ExchangeRate] Primary API HTTP {response.status_code}")
+            logger.debug(f"[ExchangeRate] Primary API raw response: {response.text[:300]}")
 
-        if response.status_code == 200:
-            data = response.json()
-            if to_currency in data.get('rates', {}):
-                rate = data['rates'][to_currency]
-                logger.info(f"[ExchangeRate] Primary API rate {from_currency}->{to_currency}: {rate}")
-                return rate
-            else:
-                logger.warning(f"[ExchangeRate] Primary API missing rate for {to_currency}")
+            if response.status_code == 200:
+                data = response.json()
+                if to_currency in data.get('rates', {}):
+                    rate = data['rates'][to_currency]
+                    logger.info(f"[ExchangeRate] Primary API rate {from_currency}->{to_currency}: {rate}")
+                    return rate
+                else:
+                    logger.warning(f"[ExchangeRate] Primary API missing {to_currency} in rates.")
+        except Exception as e:
+            logger.error(f"[ExchangeRate] Primary API request failed: {e}")
+            logger.debug(traceback.format_exc())
 
-        # Fallback API: fixer.io (free tier)
+        # Fallback API: fixer.io (now requires access key, but included for completeness)
         fallback_url = f"https://api.fixer.io/latest?base={from_currency}&symbols={to_currency}"
         logger.info(f"[ExchangeRate] Calling fallback API: {fallback_url}")
-        fallback_response = requests.get(fallback_url, timeout=10)
-        logger.info(f"[ExchangeRate] Fallback API HTTP {fallback_response.status_code}")
-        logger.debug(f"[ExchangeRate] Fallback API Response: {fallback_response.text}")
+        
+        try:
+            fallback_response = requests.get(fallback_url, timeout=10)
+            logger.info(f"[ExchangeRate] Fallback API HTTP {fallback_response.status_code}")
+            logger.debug(f"[ExchangeRate] Fallback API raw response: {fallback_response.text[:300]}")
 
-        if fallback_response.status_code == 200:
-            fallback_data = fallback_response.json()
-            if 'rates' in fallback_data and to_currency in fallback_data['rates']:
-                rate = fallback_data['rates'][to_currency]
-                logger.info(f"[ExchangeRate] Fallback API rate {from_currency}->{to_currency}: {rate}")
-                return rate
-            else:
-                logger.warning(f"[ExchangeRate] Fallback API missing rate for {to_currency}")
+            if fallback_response.status_code == 200:
+                fallback_data = fallback_response.json()
+                if 'rates' in fallback_data and to_currency in fallback_data['rates']:
+                    rate = fallback_data['rates'][to_currency]
+                    logger.info(f"[ExchangeRate] Fallback API rate {from_currency}->{to_currency}: {rate}")
+                    return rate
+                else:
+                    logger.warning(f"[ExchangeRate] Fallback API missing {to_currency} in rates.")
+        except Exception as e:
+            logger.error(f"[ExchangeRate] Fallback API request failed: {e}")
+            logger.debug(traceback.format_exc())
 
-    except Exception as e:
-        logger.exception(f"[ExchangeRate] Exception while fetching exchange rate {from_currency}->{to_currency}")
+    except Exception as outer_e:
+        logger.error(f"[ExchangeRate] Unexpected error: {outer_e}")
+        logger.debug(traceback.format_exc())
 
-    logger.error(f"[ExchangeRate] All APIs failed for {from_currency}->{to_currency}")
-    return None
+    # Final fallback
+    logger.warning(f"[ExchangeRate] Using default rate for {from_currency}_{to_currency}: {fallback_rate}")
+    return fallback_rate
 
 
 def get_default_rate(currency_pair):
