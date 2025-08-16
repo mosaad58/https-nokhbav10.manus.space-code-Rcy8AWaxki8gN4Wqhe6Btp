@@ -13,35 +13,16 @@ api_bp = Blueprint('api', __name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 def get_exchange_rate_from_api(from_currency, to_currency):
-    """Get exchange rate from two reliable APIs with fallback."""
-    apis = [
-        # 1️⃣ ExchangeRate.host (free, no API key)
-        f"https://api.exchangerate.host/latest?base={from_currency}&symbols={to_currency}",
-
-        # 2️⃣ Open ER API (free, no API key)
-        f"https://open.er-api.com/v6/latest/{from_currency}"
-    ]
-
-    for url in apis:
-        try:
-            logger.info(f"Fetching rate from: {url}")
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
+    try:
+        url = f"https://api.frankfurter.app/latest?from={from_currency}&to={to_currency}"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
             data = response.json()
-
-            # Parse based on API structure
-            if "rates" in data and to_currency in data["rates"]:
-                return data["rates"][to_currency]
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"API request failed: {url} | Error: {e}")
-        except Exception as e:
-            logger.error(f"Unexpected error from {url}: {e}")
-
-    # If all APIs fail
-    logger.warning("All live APIs failed, using default rates.")
+            if 'rates' in data and to_currency in data['rates']:
+                return data['rates'][to_currency]
+    except Exception as e:
+        logger.error(f"Error fetching exchange rate: {e}")
     return None
 
 
