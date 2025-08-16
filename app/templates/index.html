@@ -332,7 +332,7 @@
         border-color: #3b82f6;
     }
 
-       .currency-flag {
+    .currency-flag {
         font-size: 1rem;
         margin-bottom: 0.2rem;
     }
@@ -647,9 +647,6 @@
 
 {% block extra_js %}
 <script>
-// Alternative Frontend JavaScript Solution (Approach 2)
-// Replace the existing JavaScript in your index.html {% block extra_js %} section
-
 // Currency Converter functionality
 let exchangeRates = {};
 let lastUpdateTime = null;
@@ -835,8 +832,6 @@ const statsSection = document.querySelector('.stats');
 if (statsSection) {
     observer.observe(statsSection);
 }
-
-
 </script>
 {% endblock %}
 
