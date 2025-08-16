@@ -6,34 +6,40 @@ Contains all API endpoints including currency converter
 from flask import Blueprint, request, jsonify
 import requests
 import logging
-from datetime import datetime
-
 
 api_bp = Blueprint('api', __name__)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-import requests
-import logging
 
-logger = logging.getLogger(__name__)
 
 def get_exchange_rate_from_api(from_currency, to_currency):
+    """Get exchange rate from external API"""
     try:
-        url = f"https://api.exchangerate.host/convert?from={from_currency}&to={to_currency}"
-        logger.info(f"Fetching exchange rate from: {url}")
+        # Primary API: exchangerate-api.com
+        url = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
+        response = requests.get(url, timeout=10)
         
-        resp = requests.get(url, timeout=5)
-        resp.raise_for_status()
+        if response.status_code == 200:
+            data = response.json()
+            if to_currency in data['rates']:
+                return data['rates'][to_currency]
         
-        data = resp.json()
-        logger.info(f"API Response: {data}")
+        # Fallback API: fixer.io (free tier)
+        fallback_url = f"https://api.fixer.io/latest?base={from_currency}&symbols={to_currency}"
+        fallback_response = requests.get(fallback_url, timeout=10)
         
-        return data.get("result")
+        if fallback_response.status_code == 200:
+            fallback_data = fallback_response.json()
+            if 'rates' in fallback_data and to_currency in fallback_data['rates']:
+                return fallback_data['rates'][to_currency]
+                
     except Exception as e:
-        logger.error(f"Exchange rate API call failed: {e}", exc_info=True)
-        return None
+        logger.error(f"Error fetching exchange rate: {e}")
+    
+    return None
+
 
 def get_default_rate(currency_pair):
     """Get default exchange rates as fallback"""
@@ -65,70 +71,51 @@ def get_default_rate(currency_pair):
 
 @api_bp.route('/exchange-rates')
 def exchange_rates():
-    """Currency exchange rates API endpoint with fallback"""
-
-    from_currency = request.args.get('from', 'USD').upper()
-    to_currency = request.args.get('to', 'EGP').upper()
-    amount = request.args.get('amount', 1)
-
-    supported_currencies = [
-        'USD', 'EGP', 'AED', 'EUR', 'CNY', 'TRY', 'SAR', 'KWD', 'QAR', 
-        'BHD', 'OMR', 'JOD', 'LBP', 'IQD', 'SYP', 'YER', 'MAD', 'TND', 
-        'DZD', 'LYD'
-    ]
-
-    # Validate amount
+    """Currency exchange rates API endpoint"""
     try:
-        amount = float(amount)
-    except ValueError:
-        return jsonify({'error': 'Invalid amount parameter'}), 400
-
-    # Validate currencies
-    if from_currency not in supported_currencies or to_currency not in supported_currencies:
-        return jsonify({
-            'error': 'Unsupported currency',
-            'supported_currencies': supported_currencies
-        }), 400
-
-    try:
-        # Get rate
+        from_currency = request.args.get('from', 'USD').upper()
+        to_currency = request.args.get('to', 'EGP').upper()
+        amount = float(request.args.get('amount', 1))
+        
+        # Validate currencies
+        supported_currencies = ['USD', 'EGP', 'AED', 'EUR', 'CNY', 'TRY', 'SAR', 'KWD', 'QAR', 'BHD', 'OMR', 'JOD', 'LBP', 'IQD', 'SYP', 'YER', 'MAD', 'TND', 'DZD', 'LYD']
+        
+        if from_currency not in supported_currencies or to_currency not in supported_currencies:
+            return jsonify({
+                'error': 'Unsupported currency',
+                'supported_currencies': supported_currencies
+            }), 400
+        
+        # If same currency, return 1
         if from_currency == to_currency:
             rate = 1.0
         else:
+            # Try to get rate from API
             rate = get_exchange_rate_from_api(from_currency, to_currency)
+            
+            # If API fails, use default rates
             if rate is None:
                 currency_pair = f"{from_currency}_{to_currency}"
                 rate = get_default_rate(currency_pair)
                 logger.warning(f"Using default rate for {currency_pair}: {rate}")
-
-        converted_amount = round(amount * rate, 2)
-
+        
+        # Calculate converted amount
+        converted_amount = amount * rate
+        
         return jsonify({
             'from': from_currency,
             'to': to_currency,
             'rate': rate,
             'amount': amount,
-            'converted_amount': converted_amount,
-            'timestamp': datetime.utcnow().isoformat() + 'Z'
-        }), 200
-
+            'converted_amount': round(converted_amount, 2),
+            'timestamp': requests.get('http://worldtimeapi.org/api/timezone/UTC').json().get('datetime', 'N/A') if requests else 'N/A'
+        })
+        
+    except ValueError:
+        return jsonify({'error': 'Invalid amount parameter'}), 400
     except Exception as e:
         logger.error(f"Exchange rate API error: {e}")
-
-        # Use default fallback instead of failing
-        currency_pair = f"{from_currency}_{to_currency}"
-        rate = get_default_rate(currency_pair)
-        converted_amount = round(amount * rate, 2)
-
-        return jsonify({
-            'from': from_currency,
-            'to': to_currency,
-            'rate': rate,
-            'amount': amount,
-            'converted_amount': converted_amount,
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
-            'note': 'Default rate used due to API error'
-        }), 200
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @api_bp.route('/health')
