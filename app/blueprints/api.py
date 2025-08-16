@@ -15,29 +15,15 @@ logger = logging.getLogger(__name__)
 
 
 def get_exchange_rate_from_api(from_currency, to_currency):
-    """Get exchange rate from external API"""
     try:
-        # Primary API: exchangerate-api.com
-        url = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
+        url = f"https://api.exchangerate.host/latest?base={from_currency}&symbols={to_currency}"
         response = requests.get(url, timeout=10)
-        
         if response.status_code == 200:
             data = response.json()
-            if to_currency in data['rates']:
+            if 'rates' in data and to_currency in data['rates']:
                 return data['rates'][to_currency]
-        
-        # Fallback API: fixer.io (free tier)
-        fallback_url = f"https://api.fixer.io/latest?base={from_currency}&symbols={to_currency}"
-        fallback_response = requests.get(fallback_url, timeout=10)
-        
-        if fallback_response.status_code == 200:
-            fallback_data = fallback_response.json()
-            if 'rates' in fallback_data and to_currency in fallback_data['rates']:
-                return fallback_data['rates'][to_currency]
-                
     except Exception as e:
         logger.error(f"Error fetching exchange rate: {e}")
-    
     return None
 
 
