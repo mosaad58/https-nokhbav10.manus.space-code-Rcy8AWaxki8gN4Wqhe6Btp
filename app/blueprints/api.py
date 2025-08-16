@@ -6,6 +6,8 @@ Contains all API endpoints including currency converter
 from flask import Blueprint, request, jsonify
 import requests
 import logging
+from datetime import datetime
+
 
 api_bp = Blueprint('api', __name__)
 
